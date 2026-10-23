@@ -1,0 +1,70 @@
+
+### DOCUMENTAZIONE GENERATA ###
+HELP.md
+
+### MAVEN ###
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### SPRING TOOL SUITE ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### INTELLIJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+
+### NETBEANS ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS CODE ###
+.vscode/
+
+### FILE DI AMBIENTE E SEGRETI ###
+.env
+.env.*
+!.env.example
+*.pem
+*.p12
+*.pfx
+*.key
+secrets/
+config/secrets/
+
+### CONFIGURAZIONI LOCALI PRIVATE ###
+/src/main/resources/application-local.properties
+/src/main/resources/application-local.yml
+/src/main/resources/application-local.yaml
+/src/main/resources/application-prod.properties
+/src/main/resources/application-prod.yml
+/src/main/resources/application-prod.yaml
+
+### LOG E FILE TEMPORANEI ###
+*.log
+logs/
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+### DATABASE LOCALI ###
+*.db
+*.sqlite
+*.sqlite3
+*.sql.gz
