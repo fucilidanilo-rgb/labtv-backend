@@ -10,6 +10,7 @@ import com.labtv.backend.security.JwtService;
 import com.labtv.backend.service.UtenteService;
 
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,18 +21,28 @@ public class AuthController {
 
     private final UtenteService utenteService;
     private final JwtService jwtService;
+    private final boolean registrazioneAbilitata;
 
     public AuthController(
             UtenteService utenteService,
-            JwtService jwtService) {
+            JwtService jwtService,
+            @Value("${labtv.registration.enabled:false}")
+            boolean registrazioneAbilitata) {
 
         this.utenteService = utenteService;
         this.jwtService = jwtService;
+        this.registrazioneAbilitata = registrazioneAbilitata;
     }
 
     @PostMapping("/register")
     public ResponseEntity<UtenteResponse> registra(
             @Valid @RequestBody RegistrazioneRequest request) {
+
+        if (!registrazioneAbilitata) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .build();
+        }
 
         Utente utente = utenteService.registra(
                 request.nome(),

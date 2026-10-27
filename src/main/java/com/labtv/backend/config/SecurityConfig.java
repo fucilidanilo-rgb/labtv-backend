@@ -1,6 +1,7 @@
 
 package com.labtv.backend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,12 +25,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${labtv.cors.allowed-origins:http://localhost:4200}")
+            String allowedOrigins) {
 
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(
-                List.of("http://localhost:4200")
+                List.of(allowedOrigins.split(","))
         );
 
         configuration.setAllowedMethods(
@@ -49,34 +52,54 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http,
+            CorsConfigurationSource corsConfigurationSource,
+            @Value("${labtv.registration.enabled:false}")
+            boolean registrazioneAbilitata)
             throws Exception {
 
         http
                 .cors(cors -> cors
-                        .configurationSource(corsConfigurationSource()))
+                        .configurationSource(corsConfigurationSource))
 
                 .csrf(csrf -> csrf.disable())
 
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(
+                                SessionCreationPolicy.STATELESS
+                        ))
 
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
+                .authorizeHttpRequests(auth -> {
+
+                    if (registrazioneAbilitata) {
+                        auth.requestMatchers(
                                 HttpMethod.POST,
-                                "/api/auth/register",
-                                "/api/auth/login"
-                        ).permitAll()
+                                "/api/auth/register"
+                        ).permitAll();
+                    } else {
+                        auth.requestMatchers(
+                                HttpMethod.POST,
+                                "/api/auth/register"
+                        ).denyAll();
+                    }
 
-                        .requestMatchers(HttpMethod.GET, "/api/test")
-                        .permitAll()
+                    auth.requestMatchers(
+                            HttpMethod.POST,
+                            "/api/auth/login"
+                    ).permitAll();
 
-                        .anyRequest()
-                        .authenticated()
-                )
+                    auth.requestMatchers(
+                            HttpMethod.GET,
+                            "/api/test"
+                    ).permitAll();
+
+                    auth.anyRequest().authenticated();
+                })
 
                 .oauth2ResourceServer(oauth2 -> oauth2
-                        .jwt(jwt -> {}));
+                        .jwt(jwt -> {})
+                );
 
         return http.build();
     }
